@@ -21,8 +21,8 @@ class BatchprocessMachineLearningDataSelection(BatchProcess):
                                function to stop loading.
         :param dvh_data_path: dvh path to file.
         :param pyrad_data_path: pyradiomics path to file.
-        :param pyrad_value: selected value for Pyradiomics
         :param dvh_value: selected value for DVH
+        :param pyrad_value: selected value for Pyradiomics
         """
         # Call the parent class
         super(BatchprocessMachineLearningDataSelection, self).__init__(
@@ -32,8 +32,8 @@ class BatchprocessMachineLearningDataSelection(BatchProcess):
         self.dvh_data_path = dvh_data_path
         self.pyrad_data_path = pyrad_data_path
 
-        self.pyrad_value = pyrad_value
         self.dvh_value = dvh_value
+        self.pyrad_value = pyrad_value
 
         self.dvh_data = None
         self.pyrad_data = None
@@ -47,9 +47,9 @@ class BatchprocessMachineLearningDataSelection(BatchProcess):
         :return: True if successful, False if not.
         """
         # reading file
-        self.progress_callback.emit(
-            ("Reading Pyradiomics and DVH Data..", 20)
-            )
+        # self.progress_callback.emit(
+        #     ("Reading Pyradiomics and DVH Data..", 20)
+        #     )
 
         if not self.read_csv():
             self.summary = "Failed Machine learning data selection" \
@@ -57,11 +57,11 @@ class BatchprocessMachineLearningDataSelection(BatchProcess):
             return False
 
         # Machine learning
-        self.progress_callback.emit(
-            ("Filtering DVH and Pyradiomics Model..", 50)
-            )
+        # self.progress_callback.emit(
+        #     ("Filtering DVH and Pyradiomics Model..", 50)
+        #     )
         self.filter_data()
-        self.progress_callback.emit(("Saving results...", 80))
+        #self.progress_callback.emit(("Saving results...", 80))
         self.save_files()
 
         # Set summary
@@ -90,9 +90,9 @@ class BatchprocessMachineLearningDataSelection(BatchProcess):
         Function selects from DVH
         and Pyradiomcs Values that were selected for ROI
         """
-        self.dvh_data = self.dvh_data[self.dvh_data['ROI'] == self.pyrad_value]
+        self.dvh_data = self.dvh_data[self.dvh_data['ROI'] == self.dvh_value]
         self.pyrad_data = \
-            self.pyrad_data[self.pyrad_data['ROI'] == self.dvh_value]
+            self.pyrad_data[self.pyrad_data['ROI'] == self.pyrad_value]
 
     def split_path(self, path_to_file):
         """
@@ -110,9 +110,9 @@ class BatchprocessMachineLearningDataSelection(BatchProcess):
         """
         # Create directory
         dir_name_dvh = f'{self.split_path(self.dvh_data_path)}' \
-                       f'/dvh_modifed'
+                       f'/dvh_modified'
         dir_name_pyrad = f'{self.split_path(self.pyrad_data_path)}' \
-                         f'/pyradiomics_modifed'
+                         f'/pyradiomics_modified'
 
         filename_dvh = 'OnkoDICOM.DVH_Data.csv'
         filename_pyrard = 'OnkoDICOM.Pyradiomics_Data.csv'
