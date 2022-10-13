@@ -38,6 +38,9 @@ class BatchprocessMachineLearningDataSelection(BatchProcess):
         self.dvh_data = None
         self.pyrad_data = None
 
+        self.full_path_dvh = None
+        self.full_path_pyrad = None
+
     def start(self):
         """
         Goes through the steps of the ClinicalData filtering.
@@ -62,11 +65,16 @@ class BatchprocessMachineLearningDataSelection(BatchProcess):
         self.save_files()
 
         # Set summary
-        self.summary = "Completed Machine learning data selection Process"
+        self.summary = f"Completed Machine learning data selection Process\n" \
+                       f"DVH path: {self.full_path_dvh}\n" \
+                       f"Pyradiomics path {self.full_path_pyrad}"
 
         return True
 
     def read_csv(self):
+        """
+        Function reads DVH and Pyradiomics csv Files
+        """
         if self.dvh_data_path is not None and self.pyrad_data_path is not None:
             self.dvh_data = pd.read_csv(
                 f'{self.dvh_data_path}',
@@ -78,23 +86,36 @@ class BatchprocessMachineLearningDataSelection(BatchProcess):
             return False
 
     def filter_data(self):
+        """
+        Function selects from DVH
+        and Pyradiomcs Values that were selected for ROI
+        """
         self.dvh_data = self.dvh_data[self.dvh_data['ROI'] == self.pyrad_value]
         self.pyrad_data = \
             self.pyrad_data[self.pyrad_data['ROI'] == self.dvh_value]
 
     def split_path(self, path_to_file):
+        """
+        Function split path
+        provided for DVH and Pyradiomics
+        """
         pattern = r'/'
         path = re.split(pattern, path_to_file)[:-1]
         modified_path = "/".join(path)
         return modified_path
 
     def save_files(self):
+        """
+        Function saves files DVH and Pyradiomics
+        """
         # Create directory
-        dir_name_dvh = f'{self.split_path(self.dvh_data_path)}/dvh_modifed'
-        dir_name_pyrad = f'{self.split_path(self.pyrad_data_path)}" \
-            "/pyradiomics_modifed'
-        filename_dvh = "OnkoDICOM.DVH_Clinical_Data.csv"
-        filename_pyrard = "OnkoDICOM.Pyradiomics_Clinical_Data.csv"
+        dir_name_dvh = f'{self.split_path(self.dvh_data_path)}' \
+                       f'/dvh_modifed'
+        dir_name_pyrad = f'{self.split_path(self.pyrad_data_path)}' \
+                         f'/pyradiomics_modifed'
+
+        filename_dvh = 'OnkoDICOM.DVH_Data.csv'
+        filename_pyrard = 'OnkoDICOM.Pyradiomics_Data.csv'
 
         try:
             # Create Pyradiomics Directory
@@ -107,5 +128,8 @@ class BatchprocessMachineLearningDataSelection(BatchProcess):
         except FileExistsError:
             logging.debug('Directory already exists')
 
-        self.dvh_data.to_csv(f'{dir_name_dvh}/{filename_dvh}', sep=',')
-        self.pyrad_data.to_csv(f'{dir_name_pyrad}/{filename_pyrard}', sep=',')
+        self.full_path_dvh = f'{dir_name_dvh}/{filename_dvh}'
+        self.full_path_pyrad = f'{dir_name_pyrad}/{filename_pyrard}'
+
+        self.dvh_data.to_csv(self.full_path_dvh, sep=',')
+        self.pyrad_data.to_csv(self.full_path_pyrad, sep=',')
