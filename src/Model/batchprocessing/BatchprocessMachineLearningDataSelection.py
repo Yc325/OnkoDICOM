@@ -47,9 +47,9 @@ class BatchprocessMachineLearningDataSelection(BatchProcess):
         :return: True if successful, False if not.
         """
         # reading file
-        # self.progress_callback.emit(
-        #     ("Reading Pyradiomics and DVH Data..", 20)
-        #     )
+        self.progress_callback.emit(
+            ("Reading Pyradiomics and DVH Data..", 20)
+            )
 
         if not self.read_csv():
             self.summary = "Failed Machine learning data selection" \
@@ -57,11 +57,11 @@ class BatchprocessMachineLearningDataSelection(BatchProcess):
             return False
 
         # Machine learning
-        # self.progress_callback.emit(
-        #     ("Filtering DVH and Pyradiomics Model..", 50)
-        #     )
+        self.progress_callback.emit(
+            ("Filtering DVH and Pyradiomics Model..", 50)
+            )
         self.filter_data()
-        #self.progress_callback.emit(("Saving results...", 80))
+        self.progress_callback.emit(("Saving results...", 80))
         self.save_files()
 
         # Set summary
